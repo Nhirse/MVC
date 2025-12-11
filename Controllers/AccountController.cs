@@ -10,12 +10,25 @@ namespace MVC.Controllers
 {
     public class AccountController: Controller
     {
-        
-        public IActionResult Login()
+        private readonly AuthenticateLogin _auth;
+
+        public AccountController(AuthenticateLogin auth)
         {
+            _auth = auth;
+        }
+        [HttpPost]    
+        public IActionResult Login(string Username, string Password)
+        {
+            var user = _auth.ValidateUser(username, password)
+
+            if (user == null)
+            {
             //utilize authentication service
             return View(User);
-            
+            }
+            Http.Context.Session.SetInt32("userID", user.UserId);
+
+            return RedirectToAction ("Home", "Dashboard")
 
             //redirect to Dashboard.home()
         }
