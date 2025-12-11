@@ -10,7 +10,7 @@ namespace MVC.Models
         public string FileName { get; set; }
         public int numRows { get; set; }
         public int numCol {get; set;}
-        public string checksum {get; set;}
+        public string checksum {get; set;} //making sure things duplicated
         public string dateTime {get; set;}
 
         public User User {get; set;}

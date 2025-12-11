@@ -5,74 +5,52 @@ using System.Threading.Tasks;
 using System.IO;
 using Microsoft.AspNetCore.Mvc;
 using MVC.Models;
+using System.Reflection.Metadata.Ecma335;
+using Microsoft.VisualBasic;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
+using Microsoft.AspNetCore.Routing.Constraints;
+using System.Runtime.CompilerServices;
+
 
 namespace MVC.Services
 {
-    class Fetch_data
-    {
-        protected static List<List<string>> columns= new List<List<string>>();
-        protected string name_of_file;
-        protected List<string> lines;
-        protected static int num_columns = 0;
-        public string FileName
-        {
-            get { return name_of_file; }
-            set { name_of_file = value; }
-        }
-
-        public Fetch_data(string nameFile)
-        {
-            name_of_file = nameFile;
-            lines = new List<string>();
-            
-        }
-
-        public virtual void Extract_file()
-        {
-            string path = name_of_file;
-            lines = File.ReadAllLines(path).ToList();
-
-        }
-        public void AddColumn(List<string> col_list)
-        {
-            columns.Add(col_list);
-        }
-
-
-
-    }
-    class Create_column : Fetch_data
-    {
-        private List<string> data_list;
-        private int chosen_col;
-
-        public Create_column(string nameFile, int col) : base(nameFile)
-        {
-            num_columns += 1;
-            name_of_file = nameFile;
-            chosen_col = col;
-            data_list = new List<string>();
-        }
-        public override void Extract_file()
-        {
-            base.Extract_file();
-            data_list = lines[chosen_col].Split(',').ToList();
-            AddColumn(data_list);
-
-        }
-        public void getColumn()
-        {
-            foreach (string i in data_list)
-                Console.WriteLine(i);
-        }
-
-    }
     public class ExtractFile
     {
-        public ExtractedFileResult Extract(string filename)
+        public ExtractedFile Extract(string filepath)
         {
-            List<string> 
+            List<string> lines = File.ReadAllLines(filepath).ToList(); //list of rows
+            List<List<string>> table= new List<List<string>>();
+            
+            table=lines
+                .Select(x=>x.Split(',').ToList())
+                .ToList();
+
+            int numRowss=lines.Count();
+            int numColss=table[0].Count();
+
+            List<string> header= table[0];
+
+            return new ExtractedFile
+            {
+                filename=Path.GetFileName(filepath),
+                numCols=numColss,
+                numRows=numRowss,
+                headers=header,
+                Table=table
+
+            };
+            
         }
-        
+            
+   }
+
+    public class ExtractedFile
+    {
+        public string filename {get; set;}
+        public int numCols {get; set;}
+        public int numRows {get; set;}
+        public List<string> headers {get; set;}
+        public List<List<string>> Table {get; set;}
     }
+
 }
