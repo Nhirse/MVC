@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using MVC.Data;
+using MVC.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 
@@ -11,6 +12,9 @@ builder.Services.AddControllersWithViews();
 //uses Ef core to connect to it
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite("Data Source=app.db"));
+
+//Adding the ExtractFile.cs service
+builder.Services.AddScoped<ExtractFile>();
 
 var app = builder.Build();
 
