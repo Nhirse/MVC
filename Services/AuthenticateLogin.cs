@@ -10,6 +10,19 @@ namespace MVC.Services
 {
     public class AuthenticateLogin
     {
+        private readonly AppDbContext _context;
+        public AuthenticateLogin(AppDbContext context)
+        {
+            _context = context;
+        }
+
+        public User ValidateUser(string unsername, string password)
+        {
+            return _context.Users
+                .Default(u => u.Username == username && u.Password = password);
+        }
+    }
+}
         //take in the paramater that's the username and password posted by Login.cshtml view
         //parse the tables to find userID that matches
         //make a copy of the user, assign to variable user
