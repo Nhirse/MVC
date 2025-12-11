@@ -10,6 +10,15 @@ namespace MVC.Controllers
 {
     public class AccountController: Controller
     {
-        //where I put the Iactionresult for returning the User view 
+        
+        public IActionResult Login()
+        {
+            //utilize authentication service
+            return View(User);
+            
+
+            //redirect to Dashboard.home()
+        }
+
     }
 }
