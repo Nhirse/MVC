@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.IO;
+using Microsoft.AspNetCore.Mvc;
+using MVC.Models;
 
 namespace MVC.Services
 {
@@ -67,6 +69,10 @@ namespace MVC.Services
     }
     public class ExtractFile
     {
+        public ExtractedFileResult Extract(string filename)
+        {
+            List<string> 
+        }
         
     }
 }

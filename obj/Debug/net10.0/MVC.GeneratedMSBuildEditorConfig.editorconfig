@@ -34,16 +34,24 @@ build_property.EnableCodeStyleSeverity =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9tZS9EYXNoYm9hcmQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[/Users/nancinhirse/Documents/Visual Code/MVC/Views/Home/DisplayFiles.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9tZS9EaXNwbGF5RmlsZXMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/nancinhirse/Documents/Visual Code/MVC/Views/Home/ExtractNewFile.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9tZS9FeHRyYWN0TmV3RmlsZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [/Users/nancinhirse/Documents/Visual Code/MVC/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9tZS9JbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/nancinhirse/Documents/Visual Code/MVC/Views/Home/Login.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9tZS9Mb2dpbi5jc2h0bWw=
-build_metadata.AdditionalFiles.CssScope = 
-
 [/Users/nancinhirse/Documents/Visual Code/MVC/Views/Home/Privacy.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9tZS9Qcml2YWN5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/nancinhirse/Documents/Visual Code/MVC/Views/Login.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvTG9naW4uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [/Users/nancinhirse/Documents/Visual Code/MVC/Views/Shared/Error.cshtml]
