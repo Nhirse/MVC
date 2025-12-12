@@ -17,10 +17,10 @@ namespace MVC.Services
             _context = context;
         }
 
-        public User ValidateUser(string username, string password)
+        public User? ValidateUser(string username, string password)
         {
             return _context.Users
-                .Default(u => u.Username == username && u.Password = password);
+                .FirstOrDefault(u => (u.Username == username) && (u.Password == password));
         }
     }
 }

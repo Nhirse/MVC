@@ -28,11 +28,11 @@ namespace MVC.Controllers
             if (user == null)
             {
             //utilize authentication service
-            return View(User);
+            return View();
             }
             HttpContext.Session.SetInt32("userID", user.UserId);
 
-            return RedirectToAction ("Home", "Dashboard")
+            return RedirectToAction ("Home", "Dashboard");
 
             //redirect to Dashboard.home()
         }

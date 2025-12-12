@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using MVC.Data;
 using MVC.Services;
+using MVC.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 
@@ -16,8 +17,18 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 //Adding the ExtractFile.cs service
 builder.Services.AddScoped<ExtractFile>();
 
+//add session services
+builder.Services.AddDistributedMemoryCache();
+
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
 var app = builder.Build();
-app.UseSession();
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -29,7 +40,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseRouting();
-
+app.UseSession();
 app.UseAuthorization();
 
 app.MapStaticAssets();
@@ -39,5 +50,21 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+    if (!context.Users.Any())
+    {
+        context.Users.Add(new User
+        {
+            fullName = "Test User",
+            Username = "test",
+            Password = "test123"
+        });
+
+        context.SaveChanges();
+    }
+}
 
 app.Run();

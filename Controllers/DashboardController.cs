@@ -12,15 +12,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MVC.Controllers
 {
-    //[Route("[controller]")]
     public class DashboardController : Controller
     {
-       /* private readonly ILogger<DashboardController> _logger;
-
-        public DashboardController(ILogger<DashboardController> logger)
-        {
-            _logger = logger;
-        }*/
         private readonly ExtractFile _extract; //get a readonly ExtractFile
         private readonly AppDbContext _context;
         public DashboardController(ExtractFile extract, AppDbContext context) //pass a random ExtractFile automatically to the controller? why?  
@@ -37,9 +30,14 @@ namespace MVC.Controllers
         public IActionResult DisplayFiles()
         {
             int? userId=HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
 
             var allFiles= _context.Storages
-                        .Where(x=> x.UserId==userId)
+                        .Where(x=> x.UserId==userId.Value)
                         .Include(x=>x.User)
                         .ToList();
 
@@ -52,7 +50,14 @@ namespace MVC.Controllers
 
          public IActionResult ExtractNewFiles(string filepath)
         {
-            var result=_extract.Extract(filepath);
+            //temporary file path before front end is up
+            string path = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "TestFiles",
+                "student_exam_scores.csv"
+            );
+
+            var result=_extract.Extract(path);
             int? userId = HttpContext.Session.GetInt32("UserId");
 
             if (userId == null)
@@ -62,17 +67,17 @@ namespace MVC.Controllers
             var record=new Storage
             {
                 
-                UserId=userId.Value,
+                UserId=userId.Value, 
                 FileName=result.FileName,
                 numRows=result.numRows,
                 numCol=result.numCols,
+                checksum=//do checksum logic,
                 dateTime=DateTime.Now.ToString()
                 
 
             };
             //add to Storages dataset in AppDbContext
             _context.Storages.Add(record);
-            _context.Users.Where(x=>x.UserId==userId).Files.Add(record);
             _context.SaveChanges();
 
             return View();
