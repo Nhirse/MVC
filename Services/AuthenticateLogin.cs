@@ -5,6 +5,7 @@ using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using MVC.Models;
+using MVC.Data;
 
 namespace MVC.Services
 {
@@ -16,7 +17,7 @@ namespace MVC.Services
             _context = context;
         }
 
-        public User ValidateUser(string unsername, string password)
+        public User ValidateUser(string username, string password)
         {
             return _context.Users
                 .Default(u => u.Username == username && u.Password = password);
@@ -28,5 +29,5 @@ namespace MVC.Services
         //make a copy of the user, assign to variable user
         //return copy of user
         
-    }
-}
+    
+

@@ -20,6 +20,7 @@ namespace MVC.Services
         {
             List<string> lines = File.ReadAllLines(filepath).ToList(); //list of rows
             List<List<string>> table= new List<List<string>>();
+        
             
             table=lines
                 .Select(x=>x.Split(',').ToList())
@@ -32,7 +33,7 @@ namespace MVC.Services
 
             return new ExtractedFile
             {
-                filename=Path.GetFileName(filepath),
+                FileName=Path.GetFileName(filepath),
                 numCols=numColss,
                 numRows=numRowss,
                 headers=header,
@@ -46,7 +47,7 @@ namespace MVC.Services
 
     public class ExtractedFile
     {
-        public string filename {get; set;}
+        public string FileName {get; set;}
         public int numCols {get; set;}
         public int numRows {get; set;}
         public List<string> headers {get; set;}

@@ -14,7 +14,7 @@ namespace MVC.Models
         public string dateTime {get; set;}
 
         public User User {get; set;}
-
+        //why is ther a user here? it creates a user each time it's stored or it just fills in a user to match? Is that necessary when there's userid?
     }
 
 }

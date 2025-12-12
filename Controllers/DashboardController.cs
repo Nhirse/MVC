@@ -5,6 +5,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using MVC.Models;
+using MVC.Services;
+using MVC.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace MVC.Controllers
 {
@@ -17,6 +21,13 @@ namespace MVC.Controllers
         {
             _logger = logger;
         }*/
+        private readonly ExtractFile _extract; //get a readonly ExtractFile
+        private readonly AppDbContext _context;
+        public DashboardController(ExtractFile extract, AppDbContext context) //pass a random ExtractFile automatically to the controller? why?  
+        {
+            _extract=extract;
+            _context=context;
+        }
 
         public IActionResult Home()
         {
@@ -25,17 +36,47 @@ namespace MVC.Controllers
 
         public IActionResult DisplayFiles()
         {
-            return View();
+            int? userId=HttpContext.Session.GetInt32("UserId");
+
+            var allFiles= _context.Storages
+                        .Where(x=> x.UserId==userId)
+                        .Include(x=>x.User)
+                        .ToList();
+
+            return View(allFiles);
             //utilize display service
             //display service should pass list of all files
             //redirect to DisplayFiles page
 
         }
 
-         public IActionResult ExtractNewFiles()
+         public IActionResult ExtractNewFiles(string filepath)
         {
+            var result=_extract.Extract(filepath);
+            int? userId = HttpContext.Session.GetInt32("UserId");
+
+            if (userId == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+            var record=new Storage
+            {
+                
+                UserId=userId.Value,
+                FileName=result.FileName,
+                numRows=result.numRows,
+                numCol=result.numCols,
+                dateTime=DateTime.Now.ToString()
+                
+
+            };
+            //add to Storages dataset in AppDbContext
+            _context.Storages.Add(record);
+            _context.Users.Where(x=>x.UserId==userId).Files.Add(record);
+            _context.SaveChanges();
+
             return View();
-            //post will activate service that adds a file to the storage
+            //post will return a view maybe saying, file uploaded and showing history?
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
