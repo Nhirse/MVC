@@ -30,7 +30,7 @@ namespace MVC.Controllers
             //utilize authentication service
             return View(User);
             }
-            Http.Context.Session.SetInt32("userID", user.UserId);
+            HttpContext.Session.SetInt32("userID", user.UserId);
 
             return RedirectToAction ("Home", "Dashboard")
 
