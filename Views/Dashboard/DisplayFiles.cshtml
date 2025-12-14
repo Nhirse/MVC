@@ -1,0 +1,38 @@
+@model List<MVC.Models.Storage>
+
+@{
+    ViewData["Title"] = "Display Files";
+}
+
+<h1>Uploaded Files</h1>
+
+@if (Model == null || !Model.Any())
+{
+    <p>No files found.</p>
+}
+else
+{
+    <table border="1" cellpadding="6">
+        <thead>
+            <tr>
+                <th>File Name</th>
+                <th>Rows</th>
+                <th>Columns</th>
+                <th>Date</th>
+                <th>Checksum</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var file in Model)
+        {
+            <tr>
+                <td>@file.FileName</td>
+                <td>@file.numRows</td>
+                <td>@file.numCol</td>
+                <td>@file.dateTime</td>
+                <td>@file.checksum</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}

@@ -10,6 +10,9 @@ using Microsoft.VisualBasic;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Microsoft.AspNetCore.Routing.Constraints;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
+using MVC.Services.DTO;
+
 
 
 namespace MVC.Services
@@ -20,7 +23,12 @@ namespace MVC.Services
         {
             List<string> lines = File.ReadAllLines(filepath).ToList(); //list of rows
             List<List<string>> table= new List<List<string>>();
-        
+
+            // 1️⃣ Read raw file bytes
+            byte[] fileBytes = File.ReadAllBytes(filepath);
+
+            // 2️⃣ Compute checksum from raw bytes
+            string checksumm = ComputeChecksum(fileBytes);
             
             table=lines
                 .Select(x=>x.Split(',').ToList())
@@ -36,22 +44,23 @@ namespace MVC.Services
                 FileName=Path.GetFileName(filepath),
                 numCols=numColss,
                 numRows=numRowss,
+                checksum=checksumm,
                 headers=header,
                 Table=table
 
             };
-            
         }
-            
-   }
-
-    public class ExtractedFile
-    {
-        public string FileName {get; set;}
-        public int numCols {get; set;}
-        public int numRows {get; set;}
-        public List<string> headers {get; set;}
-        public List<List<string>> Table {get; set;}
+             
+        private string ComputeChecksum(byte[] fileBytes)
+        {
+            using var sha = SHA256.Create();
+            byte[] hash = sha.ComputeHash(fileBytes);
+            return Convert.ToHexString(hash); // uppercase hex string
+        }
+        
     }
+    
+    
+
 
 }

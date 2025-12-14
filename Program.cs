@@ -17,6 +17,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 //Adding the ExtractFile.cs service
 builder.Services.AddScoped<ExtractFile>();
 
+builder.Services.AddScoped<DatasetAnalysis>();
+
 //add session services
 builder.Services.AddDistributedMemoryCache();
 

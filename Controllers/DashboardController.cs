@@ -9,6 +9,7 @@ using MVC.Models;
 using MVC.Services;
 using MVC.Data;
 using Microsoft.EntityFrameworkCore;
+using MVC.Services.DTO;
 
 namespace MVC.Controllers
 {
@@ -16,10 +17,12 @@ namespace MVC.Controllers
     {
         private readonly ExtractFile _extract; //get a readonly ExtractFile
         private readonly AppDbContext _context;
-        public DashboardController(ExtractFile extract, AppDbContext context) //pass a random ExtractFile automatically to the controller? why?  
+        private readonly DatasetAnalysis _dataset;
+        public DashboardController(ExtractFile extract, AppDbContext context, DatasetAnalysis dataset) //pass a random ExtractFile automatically to the controller? why?  
         {
             _extract=extract;
             _context=context;
+            _dataset=dataset;
         }
 
         public IActionResult Home()
@@ -29,7 +32,8 @@ namespace MVC.Controllers
 
         public IActionResult DisplayFiles()
         {
-            int? userId=HttpContext.Session.GetInt32("UserId");
+            int userId=1;
+            // int? userId=HttpContext.Session.GetInt32("UserId"); temporarily giving a userID so it runs
             if (userId == null)
             {
                 return RedirectToAction("Login", "Account");
@@ -37,7 +41,7 @@ namespace MVC.Controllers
 
 
             var allFiles= _context.Storages
-                        .Where(x=> x.UserId==userId.Value)
+                        .Where(x=> x.UserId==userId) //remember to add .Value
                         .Include(x=>x.User)
                         .ToList();
 
@@ -57,30 +61,51 @@ namespace MVC.Controllers
                 "student_exam_scores.csv"
             );
 
-            var result=_extract.Extract(path);
-            int? userId = HttpContext.Session.GetInt32("UserId");
+            
+            int userId=1;
+            //int? userId = HttpContext.Session.GetInt32("UserId"); //get the UserId for the session, posted after login
 
             if (userId == null)
             {
-                return RedirectToAction("Login", "Account");
+                return RedirectToAction("DisplayFiles", "Dashboard");
+            }
+            var result=_extract.Extract(path); //using extract service to call Extract method in the instance of extractFile service
+            var analysis=_dataset.Analyze(result);
+            foreach (var col in analysis.Columns)
+            {
+                Console.WriteLine(
+                    $"{col.ColName} | {col.Type} | Count={col.Count}"
+                );
             }
             var record=new Storage
             {
                 
-                UserId=userId.Value, 
+                UserId=userId, 
                 FileName=result.FileName,
                 numRows=result.numRows,
                 numCol=result.numCols,
-                checksum=//do checksum logic,
+                checksum=result.checksum,
                 dateTime=DateTime.Now.ToString()
                 
 
             };
+
+            //check if checksum already exists
+            bool alreadyExists = _context.Storages.Any(s =>
+                s.UserId == userId && //Add .Value later
+                s.checksum == result.checksum
+            );
+            if (alreadyExists)
+            {
+                return Content("File already uploaded");
+            }
+
             //add to Storages dataset in AppDbContext
             _context.Storages.Add(record);
             _context.SaveChanges();
 
-            return View();
+            return RedirectToAction("DisplayFiles", "Dashboard");
+            //return View();
             //post will return a view maybe saying, file uploaded and showing history?
         }
 
