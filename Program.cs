@@ -19,6 +19,9 @@ builder.Services.AddScoped<ExtractFile>();
 
 builder.Services.AddScoped<DatasetAnalysis>();
 
+builder.Services.AddScoped<AuthenticateLogin>();
+
+
 //add session services
 builder.Services.AddDistributedMemoryCache();
 

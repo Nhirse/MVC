@@ -1,1 +1,72 @@
-<h1>Dashboard Home</h1>
+@model MVC.Models.ViewModels.DashboardViewModel
+<div class="mb-5">
+    <h2 class="fw-bold">Welcome back, @Model.fullName 👋</h2>
+    <p class="text-muted">
+        Analyze, extract, and explore your datasets from one place.
+    </p>
+</div>
+
+<div class="row mb-5">
+    <!-- Upload Card -->
+    <div class="col-md-6 mb-3">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">📂 Extract New Dataset</h5>
+                <p class="card-text text-muted">
+                    Upload a CSV file to generate metadata, checksums, and column analysis.
+                </p>
+                <a asp-controller="Dashboard"
+                   asp-action="ExtractNewFiles"
+                   class="btn btn-success">
+                    Upload New File
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Files Card -->
+    <div class="col-md-6 mb-3">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">📊 View My Datasets</h5>
+                <p class="card-text text-muted">
+                    Browse previously uploaded files and inspect their structure.
+                </p>
+                <a asp-controller="Dashboard"
+                   asp-action="DisplayFiles"
+                   class="btn btn-primary">
+                    View Files
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<!--info about website card-->
+<div class="card mb-5 shadow-sm">
+    <div class="card-body">
+        <h5 class="card-title">ℹ️ What This App Does</h5>
+        <p class="card-text text-muted">
+            This platform helps you upload datasets, analyze column types,
+            detect duplicates using checksums, and prepare data for deeper analysis.
+        </p>
+    </div>
+</div>
+
+<!--info card-->
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h5 class="card-title">📈 Dataset Summary</h5>
+
+        <div class="row text-center mt-3">
+            <div class="col-md-6">
+                <h4>@Model.TotalFiles</h4>
+                <p class="text-muted">Total Files Uploaded</p>
+            </div>
+
+            <div class="col-md-4">
+                <h4>@Model.LastUploaded</h4>
+                <p class="text-muted">Last Upload</p>
+            </div>
+        </div>
+    </div>
+</div>

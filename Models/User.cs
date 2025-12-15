@@ -14,6 +14,8 @@ namespace MVC.Models
         public string fullName {get; set;}
         public string Username {get; set;}
         public string Password {get; set;}
+        public string? Email {get; set;}
+        public int? Phone {get; set;}
         public List<Storage> Files {get; set;}= new();
 
     }
