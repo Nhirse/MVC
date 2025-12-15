@@ -51,7 +51,13 @@ namespace MVC.Controllers
             //redirect to DisplayFiles page
 
         }
+        // [HttpPost]
+        // public IActionResult ExtractNewFiles()
+        // {
+        //     return RedirectToAction("Home", "Dashboard");
+        // }
 
+        // [HttpGet]
          public IActionResult ExtractNewFiles(string filepath)
         {
             //temporary file path before front end is up
@@ -97,7 +103,7 @@ namespace MVC.Controllers
             );
             if (alreadyExists)
             {
-                return Content("File already uploaded");
+                return View();
             }
 
             //add to Storages dataset in AppDbContext
