@@ -10,6 +10,7 @@ using MVC.Services;
 using MVC.Data;
 using Microsoft.EntityFrameworkCore;
 using MVC.Services.DTO;
+using MVC.Models.ViewModels;
 
 namespace MVC.Controllers
 {
@@ -25,9 +26,28 @@ namespace MVC.Controllers
             _dataset=dataset;
         }
 
-        public IActionResult Home()
+        public IActionResult Home(DashboardViewModel viewmodel)
         {
-            return View();
+            int? userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var user= _context.Users.First(u=>u.UserId==userId.Value);
+            var files= _context.Storages.Where(u=>u.UserId==userId.Value)
+                        .ToList();
+            var model=new DashboardViewModel
+            {
+                TotalFiles=files.Count,
+                fullName=user.fullName,
+                LastUploaded=files
+                    .OrderByDescending(f=>f.dateTime)
+                    .Select(f=>(DateTime?)DateTime.Parse(f.dateTime))
+                    .FirstOrDefault()
+            };
+
+            return View(model);
         }
 
         public IActionResult DisplayFiles()
@@ -51,25 +71,36 @@ namespace MVC.Controllers
             //redirect to DisplayFiles page
 
         }
-
-         public IActionResult ExtractNewFiles(string filepath)
+        [HttpGet]
+        public IActionResult ExtractNewFiles()
         {
-            //temporary file path before front end is up
-            string path = Path.Combine(
-                Directory.GetCurrentDirectory(),
-                "TestFiles",
-                "student_exam_scores.csv"
-            );
+            return View();
+        }
 
-            
-            int userId=1;
-            //int? userId = HttpContext.Session.GetInt32("UserId"); //get the UserId for the session, posted after login
+        [HttpPost]
+         public IActionResult ExtractNewFiles(IFormFile file)
+        {
+            // // 1️⃣ Was a file actually received?
+            // if (file == null)
+            // {
+            //     TempData["InfoMessage"] = "No file was uploaded or the file was too large.";
+            //     return RedirectToAction("DisplayFiles");
+            // }
+
+            // // 2️⃣ Is the file too big?
+            // if (file.Length > 50_000_000) // 50 MB
+            // {
+            //     TempData["InfoMessage"] = "File is too large (max 50 MB).";
+            //     return RedirectToAction("DisplayFiles");
+            // }
+
+            int? userId = HttpContext.Session.GetInt32("UserId"); //get the UserId for the session, posted after login
 
             if (userId == null)
             {
-                return RedirectToAction("DisplayFiles", "Dashboard");
+                return RedirectToAction("Home", "Dashboard");
             }
-            var result=_extract.Extract(path); //using extract service to call Extract method in the instance of extractFile service
+            var result=_extract.Extract(file); //using extract service to call Extract method in the instance of extractFile service
             var analysis=_dataset.Analyze(result);
             foreach (var col in analysis.Columns)
             {
@@ -80,24 +111,23 @@ namespace MVC.Controllers
             var record=new Storage
             {
                 
-                UserId=userId, 
+                UserId=userId.Value, 
                 FileName=result.FileName,
                 numRows=result.numRows,
                 numCol=result.numCols,
                 checksum=result.checksum,
                 dateTime=DateTime.Now.ToString()
-                
-
             };
 
             //check if checksum already exists
             bool alreadyExists = _context.Storages.Any(s =>
-                s.UserId == userId && //Add .Value later
+                s.UserId == userId.Value && //Add .Value later
                 s.checksum == result.checksum
             );
             if (alreadyExists)
             {
-                return Content("File already uploaded");
+                TempData["InfoMessage"] = "This file was already uploaded earlier.";
+                return RedirectToAction("DisplayFiles", "Dashboard");
             }
 
             //add to Storages dataset in AppDbContext
@@ -106,7 +136,7 @@ namespace MVC.Controllers
 
             return RedirectToAction("DisplayFiles", "Dashboard");
             //return View();
-            //post will return a view maybe saying, file uploaded and showing history?
+            
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

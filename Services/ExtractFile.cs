@@ -19,13 +19,27 @@ namespace MVC.Services
 {
     public class ExtractFile
     {
-        public ExtractedFile Extract(string filepath)
+        public ExtractedFile Extract(IFormFile csvfile)
         {
-            List<string> lines = File.ReadAllLines(filepath).ToList(); //list of rows
+            List<string> lines = new(); //list of rows
             List<List<string>> table= new List<List<string>>();
 
-            // 1️⃣ Read raw file bytes
-            byte[] fileBytes = File.ReadAllBytes(filepath);
+            using (var reader=new StreamReader(csvfile.OpenReadStream()))
+            {
+                string? line;
+                while ((line=reader.ReadLine())!=null) //while there's a line to be read in the textfile
+                {
+                    lines.Add(line);
+                }
+            }
+            // 1️⃣ Read raw file bytes for checksum
+            byte[] fileBytes;
+            using (var ms=new MemoryStream())
+            {
+                csvfile.CopyTo(ms);
+                fileBytes=ms.ToArray();
+            }
+            
 
             // 2️⃣ Compute checksum from raw bytes
             string checksumm = ComputeChecksum(fileBytes);
@@ -41,7 +55,7 @@ namespace MVC.Services
 
             return new ExtractedFile
             {
-                FileName=Path.GetFileName(filepath),
+                FileName=csvfile.FileName,
                 numCols=numColss,
                 numRows=numRowss,
                 checksum=checksumm,
