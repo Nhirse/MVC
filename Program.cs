@@ -59,17 +59,6 @@ using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-    if (!context.Users.Any())
-    {
-        context.Users.Add(new User
-        {
-            fullName = "Test User",
-            Username = "test",
-            Password = "test123"
-        });
-
-        context.SaveChanges();
-    }
 }
 
 app.Run();

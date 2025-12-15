@@ -1,17 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata.Ecma335;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using MVC.Models;
+using Microsoft.EntityFrameworkCore;
 using MVC.Data;
+using MVC.Models;
 
 namespace MVC.Services
 {
     public class AuthenticateLogin
     {
         private readonly AppDbContext _context;
+
         public AuthenticateLogin(AppDbContext context)
         {
             _context = context;
@@ -19,15 +15,21 @@ namespace MVC.Services
 
         public User? ValidateUser(string username, string password)
         {
-            return _context.Users
-                .FirstOrDefault(u => (u.Username == username) && (u.Password == password));
+            // 1️⃣ Find user by username
+            var user = _context.Users
+                .FirstOrDefault(u => u.Username == username);
+
+            if (user == null)
+                return null;
+
+            // 2️⃣ Verify password using bcrypt
+            bool isValid = BCrypt.Net.BCrypt.Verify(
+                password,
+                user.Password
+            );
+
+            // 3️⃣ Return user if valid
+            return isValid ? user : null;
         }
     }
 }
-        //take in the paramater that's the username and password posted by Login.cshtml view
-        //parse the tables to find userID that matches
-        //make a copy of the user, assign to variable user
-        //return copy of user
-        
-    
-

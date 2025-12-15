@@ -33,11 +33,11 @@ namespace MVC.Controllers
             int? userId = HttpContext.Session.GetInt32("UserId");
             if (userId == null)
             {
-                return RedirectToAction("Login", "Account");
+                return RedirectToAction("Login", "Account"); //can't bypass security
             }
 
-            var user= _context.Users.First(u=>u.UserId==userId.Value);
-            var files= _context.Storages.Where(u=>u.UserId==userId.Value)
+            var user= _context.Users.First(u=>u.UserId==userId.Value);  //finding user that matches id
+            var files= _context.Storages.Where(u=>u.UserId==userId.Value) //finding storages that matches user
                         .ToList();
             var model=new DashboardViewModel
             {
@@ -54,8 +54,8 @@ namespace MVC.Controllers
 
         public IActionResult DisplayFiles()
         {
-            int userId=1;
-            // int? userId=HttpContext.Session.GetInt32("UserId"); temporarily giving a userID so it runs
+            
+            int? userId=HttpContext.Session.GetInt32("UserId"); 
             if (userId == null)
             {
                 return RedirectToAction("Login", "Account");
@@ -63,7 +63,7 @@ namespace MVC.Controllers
 
 
             var allFiles= _context.Storages
-                        .Where(x=> x.UserId==userId) //remember to add .Value
+                        .Where(x=> x.UserId==userId.Value) //remember to add .Value
                         .Include(x=>x.User)
                         .ToList();
 

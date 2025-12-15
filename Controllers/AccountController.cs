@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using MVC.Models;
 using MVC.Services;
 using MVC.Data;
+using MVC.Models.ViewModels;
+using BCrypt.Net;
+
 
 namespace MVC.Controllers
 {
@@ -27,6 +30,7 @@ namespace MVC.Controllers
 
             if (user == null)
             {
+                TempData["IncorrectPassword"] = "Incorrect Username or Password. Try Again.";
             
             return View();
             }
@@ -43,6 +47,43 @@ namespace MVC.Controllers
         {
             return View();
         }
+
+        [HttpGet]
+        public IActionResult Registration()
+        {
+            return View();
+        }
+
+
+        [HttpPost]
+        public IActionResult Registration(RegisterViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            bool usernameExists = _context.Users.Any(u => u.Username == model.Username);
+            if (usernameExists)
+            {
+                ModelState.AddModelError("", "Username already exists");
+                return View(model);
+            }
+
+            var user = new User
+            {
+                fullName = model.FullName,
+                Username = model.Username,
+                Email = model.Email,
+                Phone = model.Phone,
+                Password = BCrypt.Net.BCrypt.HashPassword(model.Password)
+            };
+
+            _context.Users.Add(user);
+            _context.SaveChanges();
+
+            TempData["SuccessMessage"] = "Account created successfully. Please log in.";
+            return RedirectToAction("Login");
+        }
+
 
     }
 }

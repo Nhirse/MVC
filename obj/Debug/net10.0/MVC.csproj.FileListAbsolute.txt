@@ -270,3 +270,4 @@
 /Users/nancinhirse/Documents/Visual Code/MVC/obj/Debug/net10.0/MVC.pdb
 /Users/nancinhirse/Documents/Visual Code/MVC/obj/Debug/net10.0/MVC.genruntimeconfig.cache
 /Users/nancinhirse/Documents/Visual Code/MVC/obj/Debug/net10.0/ref/MVC.dll
+/Users/nancinhirse/Documents/Visual Code/MVC/bin/Debug/net10.0/BCrypt.Net-Next.dll
