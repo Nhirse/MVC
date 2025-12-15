@@ -1,0 +1,50 @@
+@using MVC.Services.DTO
+
+@model MVC.Services.DTO.DataAnalysis
+
+<div class="modal-header">
+    <h5 class="modal-title">Dataset Analysis</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+
+<div class="modal-body">
+    <p><strong>Rows:</strong> @Model.RowCount</p>
+    <p><strong>Columns:</strong> @Model.ColumnCount</p>
+
+    <table class="table table-sm mt-3">
+        <thead>
+            <tr>
+                <th>Column</th>
+                <th>Type</th>
+                <th>Statistics</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var col in Model.Columns)
+        {
+            <tr>
+                <td>@col.ColName</td>
+                <td>@col.Type</td>
+                <td>
+                    @if (col.Type == ColumnType.Numeric)
+                    {
+                        <div>
+                            Mean: @col.Mean<br />
+                            Median: @col.Median<br />
+                            Min: @col.Min<br />
+                            Max: @col.Max
+                        </div>
+                    }
+                    else
+                    {
+                        <div>
+                            Mode: @col.Mode<br />
+                            Unique: @col.UniqueCount
+                        </div>
+                    }
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>

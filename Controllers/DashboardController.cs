@@ -11,6 +11,8 @@ using MVC.Data;
 using Microsoft.EntityFrameworkCore;
 using MVC.Services.DTO;
 using MVC.Models.ViewModels;
+using System.Text.Json;
+
 
 namespace MVC.Controllers
 {
@@ -80,19 +82,6 @@ namespace MVC.Controllers
         [HttpPost]
          public IActionResult ExtractNewFiles(IFormFile file)
         {
-            // // 1️⃣ Was a file actually received?
-            // if (file == null)
-            // {
-            //     TempData["InfoMessage"] = "No file was uploaded or the file was too large.";
-            //     return RedirectToAction("DisplayFiles");
-            // }
-
-            // // 2️⃣ Is the file too big?
-            // if (file.Length > 50_000_000) // 50 MB
-            // {
-            //     TempData["InfoMessage"] = "File is too large (max 50 MB).";
-            //     return RedirectToAction("DisplayFiles");
-            // }
 
             int? userId = HttpContext.Session.GetInt32("UserId"); //get the UserId for the session, posted after login
 
@@ -102,6 +91,9 @@ namespace MVC.Controllers
             }
             var result=_extract.Extract(file); //using extract service to call Extract method in the instance of extractFile service
             var analysis=_dataset.Analyze(result);
+
+            string json = JsonSerializer.Serialize(analysis);
+
             foreach (var col in analysis.Columns)
             {
                 Console.WriteLine(
@@ -116,7 +108,9 @@ namespace MVC.Controllers
                 numRows=result.numRows,
                 numCol=result.numCols,
                 checksum=result.checksum,
-                dateTime=DateTime.Now.ToString()
+                dateTime=DateTime.Now.ToString(),
+
+                AnalysisJson=json
             };
 
             //check if checksum already exists
@@ -138,6 +132,24 @@ namespace MVC.Controllers
             //return View();
             
         }
+        public IActionResult FileAnalysis(int storageId)
+        {
+            int? userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+                return Unauthorized();
+
+            var file = _context.Storages
+                .FirstOrDefault(s => s.FileId == storageId && s.UserId == userId.Value);
+
+            if (file == null || string.IsNullOrEmpty(file.AnalysisJson))
+                return NotFound();
+
+            var analysis = JsonSerializer.Deserialize<DataAnalysis>(file.AnalysisJson);
+
+            return PartialView("FileAnalysisModal", analysis);
+        }
+
+        
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

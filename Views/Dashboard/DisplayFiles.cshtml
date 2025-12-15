@@ -28,6 +28,7 @@ else
                 <th>Columns</th>
                 <th>Date</th>
                 <th>Checksum</th>
+                <th>Analysis</th>
             </tr>
         </thead>
         <tbody>
@@ -39,8 +40,83 @@ else
                 <td>@file.numCol</td>
                 <td>@file.dateTime</td>
                 <td>@file.checksum</td>
+                <td>
+                    <button
+                    class="btn btn-sm btn-outline-primary"
+                    data-bs-toggle="modal"
+                    data-bs-target="#analysisModal"
+                    data-analysis='@Html.Raw(file.AnalysisJson)'>
+                    View Analysis
+                </button>
+                </td>
             </tr>
         }
         </tbody>
     </table>
 }
+
+<div class="modal fade" id="analysisModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Dataset Analysis</h5>
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                </button>
+            </div>
+
+            <div class="modal-body" id="analysisModalContent">
+                <p class="text-muted">Loading analysis...</p>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+const analysisModal = document.getElementById('analysisModal');
+
+analysisModal.addEventListener('show.bs.modal', function (event) {
+    const button = event.relatedTarget;
+    const json = button.getAttribute('data-analysis');
+
+    if (!json) {
+        document.getElementById("analysisModalContent").innerHTML =
+            "<p class='text-muted'>No analysis available.</p>";
+        return;
+    }
+
+    const analysis = JSON.parse(json);
+
+    let html = `
+        <p><strong>Rows:</strong> ${analysis.rowCount}</p>
+        <p><strong>Columns:</strong> ${analysis.columnCount}</p>
+        <hr />
+    `;
+
+    analysis.columns.forEach(col => {
+        html += `<h6>${col.colName} (${col.type})</h6>`;
+        html += `<ul>`;
+
+        if (col.type === 1) { // Numeric
+            html += `
+                <li>Mean: ${col.mean}</li>
+                <li>Median: ${col.median}</li>
+                <li>Min: ${col.min}</li>
+                <li>Max: ${col.max}</li>
+            `;
+        } else { // Categorical
+            html += `
+                <li>Mode: ${col.mode}</li>
+                <li>Unique Values: ${col.uniqueCount}</li>
+            `;
+        }
+
+        html += `</ul><hr />`;
+    });
+
+    document.getElementById("analysisModalContent").innerHTML = html;
+});
+</script>
